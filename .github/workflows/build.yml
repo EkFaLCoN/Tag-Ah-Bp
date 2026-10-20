@@ -9,42 +9,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Kodu al
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Java 25 kur
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '25'
-          cache: maven
-          cache-dependency-path: '*/pom.xml'
 
-      - name: MarketAH derle
-        run: mvn -B -f MarketAH/pom.xml clean package
+      - name: Klasorleri goster
+        run: find . -name pom.xml -not -path './.git/*'
 
-      - name: TagSistemi derle
-        run: mvn -B -f TagSistemi/pom.xml clean package
-
-      - name: GorevPass derle
-        run: mvn -B -f GorevPass/pom.xml clean package
+      - name: Tum eklentileri derle
+        run: |
+          for pom in $(find . -name pom.xml -not -path './.git/*'); do
+            echo "=== $pom derleniyor ==="
+            mvn -B -f "$pom" clean package
+          done
 
       - name: MarketAH jar yukle
         uses: actions/upload-artifact@v4
         with:
           name: MarketAH
-          path: MarketAH/target/MarketAH.jar
+          path: '**/target/MarketAH.jar'
           if-no-files-found: error
 
       - name: TagSistemi jar yukle
         uses: actions/upload-artifact@v4
         with:
           name: TagSistemi
-          path: TagSistemi/target/TagSistemi.jar
+          path: '**/target/TagSistemi.jar'
           if-no-files-found: error
 
       - name: GorevPass jar yukle
         uses: actions/upload-artifact@v4
         with:
           name: GorevPass
-          path: GorevPass/target/GorevPass.jar
+          path: '**/target/GorevPass.jar'
           if-no-files-found: error
